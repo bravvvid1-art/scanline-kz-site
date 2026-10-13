@@ -603,7 +603,9 @@ const server=http.createServer(async(req,res)=>{
     let rel=decodeURIComponent(url.pathname);
     if(rel.endsWith("/")) rel+="index.html";
     let file=path.resolve(__dirname,"."+rel);
-    if(!file.startsWith(__dirname)){res.writeHead(403);return res.end("Forbidden")}
+    if(!file.startsWith(__dirname+path.sep)){res.writeHead(403);return res.end("Forbidden")}
+    const allowedExtensions=new Set([".html",".css",".js",".svg",".png",".jpg",".jpeg",".webp",".gif",".ico",".woff",".woff2",".ttf",".txt",".xml",".pdf",".mp4"]);
+    if(rel.split("/").some(part=>part.startsWith(".")) || (path.extname(file) && !allowedExtensions.has(path.extname(file).toLowerCase())) || ["package.json","package-lock.json","CNAME","README.md"].includes(path.basename(file))){res.writeHead(404);return res.end("Not Found")}
     try{
       const st=await stat(file);
       if(st.isDirectory()){
