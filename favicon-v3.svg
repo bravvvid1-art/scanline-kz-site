@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+<defs>
+  <radialGradient id="red" cx="34%" cy="28%" r="78%">
+    <stop offset="0" stop-color="#ff4747"/>
+    <stop offset=".42" stop-color="#f00000"/>
+    <stop offset=".78" stop-color="#b00000"/>
+    <stop offset="1" stop-color="#650000"/>
+  </radialGradient>
+  <linearGradient id="metal" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#ffffff"/>
+    <stop offset=".22" stop-color="#d9dde2"/>
+    <stop offset=".46" stop-color="#7b818a"/>
+    <stop offset=".62" stop-color="#f7f7f7"/>
+    <stop offset=".82" stop-color="#90959d"/>
+    <stop offset="1" stop-color="#eceff2"/>
+  </linearGradient>
+  <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+    <feDropShadow dx="0" dy="0" stdDeviation="1.7" flood-color="#ff1b1b" flood-opacity=".9"/>
+  </filter>
+</defs>
+<circle cx="32" cy="32" r="31" fill="#08090b"/>
+<circle cx="32" cy="32" r="29.6" fill="url(#red)" stroke="#ff3232" stroke-width="1.2" filter="url(#glow)"/>
+<ellipse cx="25" cy="16" rx="14" ry="6" fill="#fff" opacity=".14"/>
+<path d="M48 13 C42 8 32 8 25 11 C18 14 16 20 20 24 C24 28 31 29 37 31 C45 34 49 39 47 45 C45 51 37 55 29 55 C22 55 16 52 13 49"
+      fill="none" stroke="#230000" stroke-width="17" stroke-linecap="round" stroke-linejoin="round" opacity=".85"/>
+<path d="M48 13 C42 8 32 8 25 11 C18 14 16 20 20 24 C24 28 31 29 37 31 C45 34 49 39 47 45 C45 51 37 55 29 55 C22 55 16 52 13 49"
+      fill="none" stroke="url(#metal)" stroke-width="13.3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M45 12 C39 10 31 10 26 12 C22 13 20 16 20 18"
+      fill="none" stroke="#fff" stroke-width="2.1" stroke-linecap="round" opacity=".65"/>
+</svg>

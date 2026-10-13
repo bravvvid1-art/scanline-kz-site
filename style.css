@@ -1,0 +1,70 @@
+*{box-sizing:border-box}
+:root{--bg:#050505;--panel:#0e0e0e;--line:#2a2a2a;--text:#efefef;--muted:#bcbcbc;--red:#ea101a;--shadow:0 0 30px rgba(234,16,26,.3)}
+html{scroll-behavior:smooth}
+body{margin:0;background:radial-gradient(#190707 1px,transparent 1px),#070707;background-size:8px 8px;color:var(--text);font-family:Arial,Helvetica,sans-serif}
+a{color:inherit}
+.header{display:flex;align-items:center;gap:24px;padding:18px 4.5%;border-bottom:1px solid var(--line);background:#050505;position:sticky;top:0;z-index:20}
+.brand{display:block;flex:0 0 300px;min-width:220px}
+.brand img{display:block;width:100%;height:auto}
+.nav{display:flex;gap:28px;align-items:center}
+.nav a{text-decoration:none;color:#ddd;font-size:13px;font-weight:700}
+.nav a.active,.nav a:hover{color:var(--red)}
+.head-contact{margin-left:auto;text-align:left}
+.phone{font-size:18px;font-weight:800;color:#fff}
+.addr{font-size:12px;color:#cfcfcf;margin-top:6px}
+.top-btn,.cta{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;font-weight:900;color:#fff;border:1px solid #ff2e37;background:linear-gradient(180deg,#6f090d,#ba0f16);box-shadow:var(--shadow)}
+.top-btn{padding:16px 30px;background:transparent;white-space:nowrap}
+.hero{position:relative;min-height:430px;background-color:#040404;background-image:url("assets/hero-main.webp");background-position:right center;background-size:auto 100%;background-repeat:no-repeat;overflow:hidden}
+.hero__overlay{position:absolute;inset:0;background:linear-gradient(90deg,#050505 0%,rgba(5,5,5,.98) 28%,rgba(5,5,5,.82) 42%,rgba(5,5,5,.22) 58%,rgba(5,5,5,0) 74%)}
+.hero__content{position:relative;z-index:2;max-width:760px;padding:36px 4.5% 42px}
+.eyebrow{font-size:12px;letter-spacing:2px;color:#bdbdbd;margin:0 0 14px}
+h1{font-family:Impact,'Arial Black',sans-serif;font-size:68px;line-height:.9;letter-spacing:.5px;margin:0 0 18px;text-shadow:0 2px 2px #000;color:#efefef}
+h1 span{color:var(--red)}
+.lead{color:#d4d4d4;font-size:17px;line-height:1.35;margin:0 0 24px}
+.hero__actions{display:flex;align-items:center;gap:36px;flex-wrap:wrap}
+.cta{padding:18px 28px;font-size:16px}
+.facts{display:flex;gap:24px;flex-wrap:wrap;color:#f0f0f0;font-size:14px}
+.services{padding:18px 4.5% 22px;border-top:1px solid var(--line)}
+.section-head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;margin-bottom:16px}
+.section-head h2,.why h2,.contact h2{font-family:Impact,'Arial Black',sans-serif;font-size:38px;line-height:1;margin:0}
+.section-head p{font-size:12px;color:#bdbdbd;text-align:right;margin:0;max-width:720px}
+.cards{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:18px}
+.card{background:#0c0c0c;border:1px solid #343434;border-radius:4px;overflow:hidden;box-shadow:0 10px 26px rgba(0,0,0,.22)}
+.card__image{height:120px;background:#0a0a0a}
+.card__image img{display:block;width:100%;height:100%;object-fit:cover}
+.card__body{padding:16px 14px 18px;background:linear-gradient(180deg,#121212,#090909);min-height:132px}
+.card__body h3{margin:0 0 10px;font-family:Impact,'Arial Black',sans-serif;font-size:20px;line-height:1.02;letter-spacing:.2px}
+.card__body p{margin:0;color:#d3d3d3;font-size:14px;line-height:1.35}
+.bottom-grid{display:grid;grid-template-columns:1.6fr 1fr;border-top:1px solid var(--line)}
+.why{padding:24px 4.5%;border-right:1px solid var(--line)}
+.why-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:18px;margin-top:18px}
+.why-grid div{border-right:1px solid #303030;padding-right:12px}
+.why-grid strong{display:block;color:#fff;font-size:13px;line-height:1.35}
+.why-grid span{display:block;color:#bdbdbd;font-size:12px;margin-top:10px;line-height:1.3}
+.contact{padding:24px 30px;background:linear-gradient(180deg,#111,#090909)}
+.contact p{margin:10px 0 14px;color:#cfcfcf;font-size:13px}
+.contact-phone{display:inline-block;font-size:42px;font-weight:900;text-decoration:none;color:#fff;margin:6px 0 18px}
+.contact-meta{display:flex;gap:18px;flex-wrap:wrap;color:#d1d1d1;font-size:14px}
+.footer{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:18px 4.5%;border-top:1px solid var(--line);font-size:11px;letter-spacing:3px;color:#b5b5b5}
+@media (max-width:1280px){h1{font-size:58px}.cards{grid-template-columns:repeat(3,minmax(0,1fr))}.bottom-grid{grid-template-columns:1fr}.why{border-right:none;border-bottom:1px solid var(--line)}.why-grid{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:900px){.header{flex-wrap:wrap}.brand{flex:0 0 240px}.nav{order:3;width:100%;overflow:auto;white-space:nowrap;padding-top:8px}.head-contact{margin-left:0}.hero{min-height:500px;background-position:72% center}.hero__overlay{background:linear-gradient(90deg,#050505 0%,rgba(5,5,5,.97) 50%,rgba(5,5,5,.58) 72%,rgba(5,5,5,.12) 100%)}h1{font-size:46px}.section-head{display:block}.section-head p{margin-top:10px;text-align:left}.why-grid{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:640px){.top-btn{display:none}.brand{flex-basis:200px}.phone{font-size:16px}.addr{font-size:11px}.hero{min-height:530px;background-position:76% center}.hero__content{padding:26px 18px 34px}.eyebrow{font-size:11px}h1{font-size:38px}.lead{font-size:15px}.cta{width:100%;padding:16px 18px;font-size:15px}.facts{font-size:13px;gap:14px}.services{padding:18px}.cards{grid-template-columns:1fr;gap:12px}.card__image{height:160px}.why,.contact{padding:20px 18px}.why-grid{grid-template-columns:1fr}.why-grid div{border-right:none;padding-right:0;border-bottom:1px solid #252525;padding-bottom:12px}.contact-phone{font-size:28px}.footer{padding:16px 18px;display:block;line-height:1.8}}
+
+/* BERESTOFF approved corporate badge — 2026-09-26 */
+body::after{
+  content:"";
+  position:fixed;
+  left:max(12px,env(safe-area-inset-left));
+  bottom:max(12px,env(safe-area-inset-bottom));
+  z-index:10000;
+  width:132px;
+  height:38px;
+  border:0;
+  border-radius:0;
+  background:transparent url("https://berestoff.kz/berestoff-logo.png?v=20260926-7") center/contain no-repeat;
+  box-shadow:none;
+  pointer-events:none;
+}
+@media(max-width:640px){
+  body::after{left:max(9px,env(safe-area-inset-left));bottom:max(9px,env(safe-area-inset-bottom));width:108px;height:32px;background-size:contain;border-radius:8px}
+}
