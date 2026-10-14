@@ -1,4 +1,5 @@
 import http from "node:http";
+import { gzipSync } from "node:zlib";
 import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -535,7 +536,7 @@ function visitorCounterSnippet(lang="ru"){
   const label=kk?"САЙТҚА КІРУШІЛЕР":"ПОСЕТИТЕЛЕЙ САЙТА";
   const sub=kk?"бірегей браузерлер, есептегіш орнатылған сәттен бастап":"уникальные браузеры с момента установки счётчика";
   const locale=kk?"kk-KZ":"ru-RU";
-  return '<section class="site-visitor-counter" aria-label="'+label+'">'+
+  return '<script defer src="/contact-metrics.js?v=20261014"></script><section class="site-visitor-counter" aria-label="'+label+'">'+
     '<div class="site-visitor-counter__inner"><span class="site-visitor-counter__label">'+label+'</span>'+
     '<strong class="site-visitor-counter__number" id="siteVisitorCount">…</strong>'+
     '<span class="site-visitor-counter__sub">'+sub+'</span></div></section>'+
@@ -577,6 +578,16 @@ const server=http.createServer(async(req,res)=>{
       res.writeHead(301,{Location:legacyRedirects[normalizedPath],"Cache-Control":"public, max-age=86400"});
       return res.end();
     }
+
+    if(req.method==='POST' && url.pathname==='/api/contact-event'){
+      const data=await readJsonBody(req,2048);
+      if(!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(data.id||'') || !['phone','whatsapp'].includes(data.channel) || !['ru','kk'].includes(data.lang) || !/^\/[A-Za-z0-9/_-]{0,179}$/.test(data.page||''))return json(res,400,{error:'Invalid event'});
+      const base=process.env.SUPABASE_URL, key=process.env.SUPABASE_PUBLISHABLE_KEY;
+      if(!base||!key)return json(res,503,{error:'Metrics unavailable'});
+      const r=await fetch(base+'/rest/v1/scanline_contact_events',{method:'POST',signal:AbortSignal.timeout(8000),headers:{apikey:key,Authorization:'Bearer '+key,'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify({id:data.id,channel:data.channel,page:data.page,lang:data.lang})});
+      return json(res,r.ok?200:r.status===409?200:502,{ok:r.ok||r.status===409});
+    }
+
     if(req.method==="POST"&&url.pathname==="/api/visitor-count"){
       try{
         const data=await readJsonBody(req,2048);
@@ -620,9 +631,9 @@ const server=http.createServer(async(req,res)=>{
       const ruPath=kkRuPath(requestedKkPath);
       if(kkPages[ruPath]){
         const html=kkPageHtml(kkPages[ruPath],ruPath).replace("</head>",responsiveAuditCss()+"</head>").replace("</body>",visitorCounterSnippet("kk")+"</body>").replaceAll("https://scanline.kz/","https://www.scanline.kz/");
-        res.writeHead(200,{"Content-Type":"text/html; charset=utf-8","Cache-Control":"no-store, no-cache, must-revalidate","Content-Language":"kk-KZ"});
+        const compressed=/gzip/.test(req.headers["accept-encoding"]||""); res.writeHead(200,{"Content-Type":"text/html; charset=utf-8","Cache-Control":"no-cache","Content-Language":"kk-KZ",Vary:"Accept-Encoding",...(compressed?{"Content-Encoding":"gzip"}:{})});
         if(req.method==="HEAD") return res.end();
-        return res.end(html);
+        return res.end(compressed?gzipSync(html):html);
       }
       return await notFound(req,res);
     }
@@ -665,9 +676,13 @@ const server=http.createServer(async(req,res)=>{
         if(!html.includes("site-visitor-counter")){
           html=html.replace("</body>",visitorCounterSnippet("ru")+"</body>");
         }
+        html=html.replace('<div class="phone">☎ +7 707 344 44 04</div>','<a class="phone" href="tel:+77073444404">☎ +7 707 344 44 04</a>');
+        html=html.replace(/<img([^>]*class="hero-bg"[^>]*)>/g,'<img$1 fetchpriority="high" decoding="async">');
         buf=Buffer.from(html.replaceAll("https://scanline.kz/","https://www.scanline.kz/"),"utf8");
       }
-      res.writeHead(200,{"Content-Type":contentType,"Cache-Control":"no-store, no-cache, must-revalidate","Content-Language":"ru-KZ"});
+      const headers={"Content-Type":contentType,"Cache-Control":['.webp','.png','.jpg','.svg','.woff','.woff2'].includes(path.extname(file).toLowerCase())?'public, max-age=86400, stale-while-revalidate=604800':'no-cache',"Content-Language":"ru-KZ",Vary:'Accept-Encoding'};
+      if(/text\/|javascript|json|xml/.test(contentType) && /gzip/.test(req.headers['accept-encoding']||'')){buf=gzipSync(buf);headers['Content-Encoding']='gzip';}
+      res.writeHead(200,headers);
       if(req.method==="HEAD") return res.end();
       return res.end(buf);
     }catch{
