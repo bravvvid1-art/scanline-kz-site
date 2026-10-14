@@ -2,6 +2,7 @@ import http from "node:http";
 import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { buildSitemap, sitemapUrls, normalizeLocalizedSeo } from "./seo.mjs";
 
 const __dirname=path.dirname(fileURLToPath(import.meta.url));
 const PORT=Number(process.env.PORT||8080);
@@ -597,11 +598,17 @@ const server=http.createServer(async(req,res)=>{
       return json(res,200,{...out,whatsapp:WHATSAPP});
     }
     if(req.method!=="GET"&&req.method!=="HEAD"){res.writeHead(405);return res.end("Method Not Allowed")}
+    if(url.pathname==="/sitemap.xml" || url.pathname==="/sitemap.txt"){
+      const xml=url.pathname.endsWith(".xml");
+      const body=xml?buildSitemap(Object.keys(kkPages)):sitemapUrls(Object.keys(kkPages)).join("\n")+"\n";
+      res.writeHead(200,{"Content-Type":xml?"application/xml; charset=utf-8":"text/plain; charset=utf-8","Cache-Control":"public, max-age=300"});
+      return res.end(req.method==="HEAD"?undefined:body);
+    }
     if(url.pathname==="/kk" || url.pathname==="/kk/" || url.pathname.startsWith("/kk/")){
       const requestedKkPath=url.pathname==="/kk"?"/kk/":url.pathname;
       const ruPath=kkRuPath(requestedKkPath);
       if(kkPages[ruPath]){
-        const html=kkPageHtml(kkPages[ruPath],ruPath).replace("</head>",responsiveAuditCss()+"</head>").replace("</body>",visitorCounterSnippet("kk")+"</body>").replaceAll("https://scanline.kz/","https://www.scanline.kz/");
+        const html=normalizeLocalizedSeo(kkPageHtml(kkPages[ruPath],ruPath),hreflangTagsForRu(ruPath),ruPath).replace("</head>",responsiveAuditCss()+"</head>").replace("</body>",visitorCounterSnippet("kk")+"</body>");
         res.writeHead(200,{"Content-Type":"text/html; charset=utf-8","Cache-Control":"no-store, no-cache, must-revalidate","Content-Language":"kk-KZ"});
         if(req.method==="HEAD") return res.end();
         return res.end(html);
@@ -639,7 +646,7 @@ const server=http.createServer(async(req,res)=>{
           html=html.replace("</head>",'<script defer src="/lang.js?v=20260923-mobile-audit2"></script></head>');
         }
         if(kkPages[ruKey]){
-          html=html.replace("</head>",hreflangTagsForRu(ruKey)+"</head>");
+          html=normalizeLocalizedSeo(html,hreflangTagsForRu(ruKey),ruKey);
         }
         if(!html.includes("scanline-responsive-audit")){
           html=html.replace("</head>",responsiveAuditCss()+"</head>");
@@ -659,4 +666,7 @@ const server=http.createServer(async(req,res)=>{
     console.error(e); json(res,e.status||((e instanceof URIError)?400:500),{error:e.status?e.message:"Server error"});
   }
 });
-server.listen(PORT,"0.0.0.0",()=>console.log("ScanLine server listening on",PORT));
+export { kkPages, kkPageHtml, responsiveAuditCss, hreflangTagsForRu };
+if(process.argv[1] && path.resolve(process.argv[1])===fileURLToPath(import.meta.url)){
+  server.listen(PORT,"0.0.0.0",()=>console.log("ScanLine server listening on",PORT));
+}
