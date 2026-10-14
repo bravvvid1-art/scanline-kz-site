@@ -530,6 +530,10 @@ async function notFound(req,res){
   res.writeHead(404,{"Content-Type":"text/html; charset=utf-8","Cache-Control":"no-store"});
   return res.end(req.method==="HEAD"?undefined:html);
 }
+async function readJsonBody(req,limit){
+  let body="";for await(const chunk of req){body+=chunk;if(Buffer.byteLength(body)>limit){const e=new Error("Request too large");e.status=413;throw e;}}
+  try{return JSON.parse(body||"{}");}catch{const e=new Error("Invalid JSON");e.status=400;throw e;}
+}
 const server=http.createServer(async(req,res)=>{
   try{
     const url=new URL(req.url,"http://localhost");
@@ -557,14 +561,14 @@ const server=http.createServer(async(req,res)=>{
     }
     if(req.method==="POST"&&url.pathname==="/api/visitor-count"){
       try{
-        let body=""; for await(const ch of req){body+=ch;if(body.length>2048)break}
-        const data=JSON.parse(body||"{}");
+        const data=await readJsonBody(req,2048);
         const visitorId=String(data.visitorId||"").trim();
         if(!/^[A-Za-z0-9._:-]{10,128}$/.test(visitorId)) return json(res,400,{error:"Invalid visitor id"});
         const supabaseUrl=String(process.env.SUPABASE_URL||"").replace(/\/$/,"");
         const supabaseKey=String(process.env.SUPABASE_PUBLISHABLE_KEY||"");
         if(!supabaseUrl||!supabaseKey) return json(res,503,{error:"Counter unavailable"});
         const sr=await fetch(supabaseUrl+"/rest/v1/rpc/increment_scanline_visitor",{
+          signal:AbortSignal.timeout(8000),
           method:"POST",
           headers:{"Content-Type":"application/json","apikey":supabaseKey,"Authorization":"Bearer "+supabaseKey},
           body:JSON.stringify({p_visitor_id:visitorId})
@@ -577,16 +581,16 @@ const server=http.createServer(async(req,res)=>{
         return json(res,200,{count});
       }catch(e){
         console.error("visitor counter",e);
-        return json(res,500,{error:"Counter error"});
+        return json(res,e.status||500,{error:e.status?e.message:"Counter error"});
       }
     }
     if(req.method==="POST"&&url.pathname==="/api/chat"){
       const ip=(req.headers["x-forwarded-for"]||req.socket.remoteAddress||"").toString().split(",")[0].trim();
       const now=Date.now(),last=rate.get(ip)||0;
+      if(rate.size>5000)rate.delete(rate.keys().next().value);
       if(now-last<1200) return json(res,429,{error:"Слишком часто. Подождите секунду."});
       rate.set(ip,now);
-      let body=""; for await(const ch of req){body+=ch;if(body.length>24000)break}
-      const data=JSON.parse(body||"{}");
+      const data=await readJsonBody(req,24000);
       const message=String(data.message||"").trim().slice(0,600);
       if(!message) return json(res,400,{error:"Введите вопрос."});
       const out=await aiAnswer(message,data.history,String(data.lang||"ru").toLowerCase().startsWith("kk")?"kk":"ru");
@@ -597,7 +601,7 @@ const server=http.createServer(async(req,res)=>{
       const requestedKkPath=url.pathname==="/kk"?"/kk/":url.pathname;
       const ruPath=kkRuPath(requestedKkPath);
       if(kkPages[ruPath]){
-        const html=kkPageHtml(kkPages[ruPath],ruPath).replace("</head>",responsiveAuditCss()+"</head>").replace("</body>",visitorCounterSnippet("kk")+"</body>");
+        const html=kkPageHtml(kkPages[ruPath],ruPath).replace("</head>",responsiveAuditCss()+"</head>").replace("</body>",visitorCounterSnippet("kk")+"</body>").replaceAll("https://scanline.kz/","https://www.scanline.kz/");
         res.writeHead(200,{"Content-Type":"text/html; charset=utf-8","Cache-Control":"no-store, no-cache, must-revalidate","Content-Language":"kk-KZ"});
         if(req.method==="HEAD") return res.end();
         return res.end(html);
@@ -617,6 +621,7 @@ const server=http.createServer(async(req,res)=>{
       }
       let buf=await readFile(file);
       const contentType=mime(file);
+      if(["sitemap.xml","sitemap.txt","robots.txt"].includes(path.basename(file)))buf=Buffer.from(buf.toString("utf8").replaceAll("https://scanline.kz/","https://www.scanline.kz/"));
       if(path.extname(file).toLowerCase()===".html"){
         const ruKey=url.pathname==="/"?"/":(url.pathname.endsWith("/")?url.pathname:url.pathname+"/");
         let html=buf.toString("utf8");
@@ -642,7 +647,7 @@ const server=http.createServer(async(req,res)=>{
         if(!html.includes("site-visitor-counter")){
           html=html.replace("</body>",visitorCounterSnippet("ru")+"</body>");
         }
-        buf=Buffer.from(html,"utf8");
+        buf=Buffer.from(html.replaceAll("https://scanline.kz/","https://www.scanline.kz/"),"utf8");
       }
       res.writeHead(200,{"Content-Type":contentType,"Cache-Control":"no-store, no-cache, must-revalidate","Content-Language":"ru-KZ"});
       if(req.method==="HEAD") return res.end();
@@ -651,7 +656,7 @@ const server=http.createServer(async(req,res)=>{
       return await notFound(req,res);
     }
   }catch(e){
-    console.error(e); json(res,500,{error:"Server error"});
+    console.error(e); json(res,e.status||((e instanceof URIError)?400:500),{error:e.status?e.message:"Server error"});
   }
 });
 server.listen(PORT,"0.0.0.0",()=>console.log("ScanLine server listening on",PORT));
