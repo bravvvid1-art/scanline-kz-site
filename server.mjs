@@ -602,8 +602,7 @@ const server=http.createServer(async(req,res)=>{
         if(req.method==="HEAD") return res.end();
         return res.end(html);
       }
-      res.writeHead(404,{"Content-Type":"text/plain; charset=utf-8","Cache-Control":"no-store"});
-      return res.end("Not Found");
+      return await notFound(req,res);
     }
     let rel=decodeURIComponent(url.pathname);
     if(rel.endsWith("/")) rel+="index.html";
@@ -649,8 +648,7 @@ const server=http.createServer(async(req,res)=>{
       if(req.method==="HEAD") return res.end();
       return res.end(buf);
     }catch{
-      res.writeHead(404,{"Content-Type":"text/plain; charset=utf-8","Cache-Control":"no-store"});
-      return res.end("Not Found");
+      return await notFound(req,res);
     }
   }catch(e){
     console.error(e); json(res,500,{error:"Server error"});
