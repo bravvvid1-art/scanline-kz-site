@@ -65,6 +65,7 @@ export function translate(s){
 export function translationKnown(s){return Object.hasOwn(translations,norm(s))||translate(s)!==norm(s);}
 export function localizeRussianHtml(html,data,ruPath,paths){
   const kkPath='/kk'+ruPath;
+  html=html.replace('</head>','<meta name="google" content="notranslate"></head>');
   html=html.replace(/<html\b([^>]*)lang="ru"/i,'<html$1lang="kk"');
   html=html.replace(/<title>[^]*?<\/title>/i,'<title>'+escape(data.title)+'</title>');
   html=html.replace(/(<meta\b[^>]*name="description"[^>]*content=")[^"]*(")/i,'$1'+escape(data.description)+'$2');
@@ -113,7 +114,7 @@ export function localizeRussianHtml(html,data,ruPath,paths){
   // Only font fallback differs: Impact lacks reliable Kazakh glyphs. All layout CSS is shared.
   html=html.replace('</head>','<style id="kazakh-glyph-fallback">@font-face{font-family:ScanLineCondensed;src:url(/assets/roboto-condensed-700.ttf) format("truetype");font-style:normal;font-weight:700;font-display:swap}html[lang="kk"] h1,html[lang="kk"] h2,html[lang="kk"] h3{font-family:ScanLineCondensed,Arial,sans-serif!important;font-weight:700;letter-spacing:normal}html[lang="kk"] .cta,html[lang="kk"] .top-btn{font-weight:700}html[lang="kk"] .head-contact{flex-shrink:0}html[lang="kk"] .phone{white-space:nowrap}@media(max-width:1500px){html[lang="kk"] .header{flex-wrap:wrap}html[lang="kk"] .header>.nav{order:20;width:100%;flex-basis:100%;gap:18px;overflow:auto;white-space:nowrap}}</style></head>');
   if(!/\/lang\.css/.test(html))html=html.replace('</head>','<link rel="stylesheet" href="/lang.css"></head>');
-  if(!/\/lang\.js/.test(html))html=html.replace('</head>','<script defer src="/lang.js?v=20261014-shared-layout"></script></head>');
-  html=html.replace(/\/lang\.js\?v=[^"'<> ]+/g,'/lang.js?v=20261014-shared-layout');
+  if(!/\/lang\.js/.test(html))html=html.replace('</head>','<script defer src="/lang.js?v=20261014-language-header"></script></head>');
+  html=html.replace(/\/lang\.js\?v=[^"'<> ]+/g,'/lang.js?v=20261014-language-header');
   return html;
 }

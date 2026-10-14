@@ -1,5 +1,5 @@
 /* ScanLine bilingual RU/KK switch */
-.lang-switch{display:flex;align-items:center;gap:4px;margin-left:4px;padding:4px;border:1px solid rgba(54,122,218,.55);border-radius:999px;background:rgba(5,9,16,.82);box-shadow:0 0 14px rgba(21,93,255,.10);white-space:nowrap}
+.lang-switch{width:max-content;flex:0 0 auto;display:flex;align-items:center;gap:4px;margin-left:4px;padding:4px;border:1px solid rgba(54,122,218,.55);border-radius:999px;background:rgba(5,9,16,.82);box-shadow:0 0 14px rgba(21,93,255,.10);white-space:nowrap}
 .lang-btn{border:0;background:transparent;color:#aeb9c9;font:800 11px/1 Arial,sans-serif;padding:7px 9px;border-radius:999px;cursor:pointer;letter-spacing:.5px}
 .lang-btn.active{background:linear-gradient(135deg,#123f87,#0b67d7);color:#fff;box-shadow:0 0 10px rgba(21,93,255,.24)}
 .lang-btn:hover{color:#fff}

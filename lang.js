@@ -186,7 +186,7 @@ function apply(to){
   storageSet("scanlineLang",to);
 }
 function mount(){
-  let host=document.querySelector('.header')||document.querySelector('header')||document.body;
+  let host=document.querySelector('.header')||document.querySelector('header .head')||document.querySelector('header .h')||document.querySelector('header')||document.body;
   if(!document.querySelector('.lang-switch')){
     const s=document.createElement('div');s.className='lang-switch';s.innerHTML='<button class="lang-btn" data-lang="ru" type="button">РУС</button><button class="lang-btn" data-lang="kk" type="button">ҚАЗ</button>';
     host.appendChild(s);s.querySelectorAll('button').forEach(b=>b.onclick=()=>{
