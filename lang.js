@@ -198,8 +198,18 @@ function mount(){
         return;
       }
       storageSet("scanlineLang","ru");
+      if(/^\/kk(?:\/|$)/.test(location.pathname)){
+        const ruPath=location.pathname.replace(/^\/kk/,"")||"/";
+        navigateTo(ruPath+"?lang=ru");
+        return;
+      }
       apply("ru");
     });
+  }
+  if(document.documentElement.lang==="kk"){
+    storageSet("scanlineLang","kk");
+    document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.dataset.lang==='kk'));
+    return;
   }
   const qp=new URLSearchParams(location.search).get("lang");
   const saved=qp==="kk"||qp==="ru"?qp:storageGet("scanlineLang");

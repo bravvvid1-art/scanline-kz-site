@@ -3,7 +3,7 @@ import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { buildSitemap, sitemapUrls, normalizeLocalizedSeo } from "./seo.mjs";
-import { kkServiceSections } from "./localized-content.mjs";
+import { localizeRussianHtml } from "./shared-localization.mjs";
 
 const __dirname=path.dirname(fileURLToPath(import.meta.url));
 const PORT=Number(process.env.PORT||8080);
@@ -460,64 +460,9 @@ function kkNavLinks(){
     ["/kk/ceny/","БАҒАЛАР"]
   ].map(([href,label])=>'<a href="'+href+'">'+label+'</a>').join("");
 }
-function kkPageHtml(data,ruPath){
-  const kkPath=kkAltPath(ruPath);
-  const phone="+7 707 344 44 04";
-  const details=(kkServiceSections[ruPath]||[]).map(section=>
-    '<section><div class="wrap"><div class="box"><h2>'+escapeHtml(section.title)+'</h2>'+
-    (section.paragraphs||[]).map(p=>'<p>'+escapeHtml(p)+'</p>').join('')+
-    (section.items?'<ul>'+section.items.map(p=>'<li>'+escapeHtml(p)+'</li>').join('')+'</ul>':'')+
-    '</div></div></section>').join('');
-  const links=[
-    ["/kk/avtoelektrik-almaty/","Алматы автоэлектригі"],
-    ["/kk/kompyuternaya-diagnostika/","Компьютерлік диагностика"],
-    ["/kk/remont-avtoelektriki/","Автоэлектриканы жөндеу"],
-    ["/kk/remont-provodki/","Сымдарды жөндеу"],
-    ["/kk/diagnostika-kitajskih-avto/","Қытай көліктері"],
-    ["/kk/marki/dodge-jeep-chrysler/","Dodge / Jeep / Chrysler"],
-    ["/kk/marki/ford-mustang/","Ford / Mustang"],
-    ["/kk/marki/peugeot-citroen/","Peugeot / Citroën"],
-    ["/kk/marki/renault/","Renault"],
-    ["/kk/amerikanskie-avtomobili/","Америкалық көліктер"],
-    ["/kk/francuzskie-avtomobili/","Француз көліктері"],
-    ["/kk/ustanovka-avtomagnitoly/","Автомагнитола орнату"],
-    ["/kk/ustanovka-kamery-zadnego-vida/","Артқы камера"],
-    ["/kk/ustanovka-avtosignalizacii/","Автосигнализация"],
-    ["/kk/ustanovka-avtozapuska/","Автозапуск"],
-    ["/kk/gps-mayaki/","GPS-маяк / GPS-трекер"],
-    ["/kk/ustanovka-dopolnitelnogo-oborudovaniya/","Қосымша жабдық"],
-    ["/kk/problemy/check-engine/","Check Engine"],
-    ["/kk/problemy/mashina-ne-zavoditsya/","Көлік оталмайды"],
-    ["/kk/problemy/utechka-toka/","Токтың ағып кетуі"],
-    ["/kk/marki/","Маркалар"]
-  ].map(([href,label])=>'<a href="'+href+'">'+label+'</a>').join("");
-  const schema=JSON.stringify({
-    "@context":"https://schema.org",
-    "@graph":[
-      {"@type":"AutoRepair","@id":"https://scanline.kz/#business","name":"ScanLine","url":"https://scanline.kz/","telephone":"+77073444404","address":{"@type":"PostalAddress","streetAddress":"Крылова көшесі 36","addressLocality":"Алматы","addressCountry":"KZ"},"openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],"opens":"10:00","closes":"18:00"}],"areaServed":{"@type":"City","name":"Алматы"}},
-      {"@type":"Service","@id":"https://scanline.kz"+kkPath+"#service","name":data.service,"provider":{"@id":"https://scanline.kz/#business"},"areaServed":{"@type":"City","name":"Алматы"},"url":"https://scanline.kz"+kkPath},
-      {"@type":"WebPage","@id":"https://scanline.kz"+kkPath+"#webpage","url":"https://scanline.kz"+kkPath,"name":data.title,"description":data.description,"inLanguage":"kk-KZ","about":{"@id":"https://scanline.kz"+kkPath+"#service"}},
-      {"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Басты бет","item":"https://scanline.kz/kk/"},{"@type":"ListItem","position":2,"name":data.h1,"item":"https://scanline.kz"+kkPath}]}
-    ]
-  });
-  return '<!doctype html><html lang="kk"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">'+
-    '<title>'+escapeHtml(data.title)+'</title><meta name="description" content="'+escapeHtml(data.description)+'">'+
-    '<meta name="robots" content="index,follow,max-image-preview:large">'+
-    '<link rel="canonical" href="https://scanline.kz'+kkPath+'">'+
-    '<link rel="alternate" hreflang="kk-KZ" href="https://scanline.kz'+kkPath+'">'+
-    '<link rel="alternate" hreflang="ru-KZ" href="https://scanline.kz'+ruPath+'">'+
-    '<link rel="alternate" hreflang="x-default" href="https://scanline.kz'+ruPath+'">'+
-    '<meta property="og:type" content="website"><meta property="og:locale" content="kk_KZ">'+
-    '<meta property="og:title" content="'+escapeHtml(data.title)+'"><meta property="og:description" content="'+escapeHtml(data.description)+'">'+
-    '<meta property="og:url" content="https://scanline.kz'+kkPath+'">'+
-    '<script type="application/ld+json">'+schema+'</script>'+
-    '<style>*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#07090d;color:#eee;font-family:Arial,Helvetica,sans-serif;line-height:1.58}a{color:inherit}.wrap{width:min(1160px,92%);margin:auto}header{position:sticky;top:0;z-index:10;background:rgba(5,7,10,.96);border-bottom:1px solid #273044}.head{min-height:78px;display:flex;align-items:center;gap:24px}.brand{text-decoration:none;font:900 27px/1 Arial}.brand b{color:#ed1720}.nav{display:flex;gap:18px;margin-left:auto}.nav a{text-decoration:none;font-size:12px;font-weight:800}.lang{display:flex;gap:6px}.lang a{border:1px solid #3d4759;padding:7px 9px;text-decoration:none;font-size:11px;font-weight:800}.lang .active{border-color:#ed1720}.hero{padding:72px 0 58px;background:radial-gradient(circle at 82% 15%,rgba(23,98,255,.20),transparent 27%),linear-gradient(135deg,#080b10,#050505 64%);border-bottom:1px solid #222b39}.kicker{color:#ed1720;font-weight:900;letter-spacing:2px;font-size:12px}.hero h1{font-family:Arial,Helvetica,sans-serif;font-weight:700;font-size:clamp(36px,5vw,60px);line-height:1.18;letter-spacing:normal;margin:12px 0 20px;max-width:950px}.lead{font-size:19px;color:#cfd5df;max-width:900px}.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:26px}.btn{display:inline-flex;padding:14px 18px;border:1px solid #ef2630;text-decoration:none;font-weight:700;background:linear-gradient(#79090e,#b80e15)}section{padding:46px 0}.content{display:grid;grid-template-columns:1.3fr .7fr;gap:24px}.box{background:#0c1016;border:1px solid #2b3545;padding:26px}.box h2{font-family:Arial,Helvetica,sans-serif;font-weight:800;font-size:30px;line-height:1.25;margin:0 0 14px}.box p{color:#c8d0dc}.local{border-left:3px solid #ed1720}.links{display:flex;flex-wrap:wrap;gap:9px}.links a{border:1px solid #32405a;padding:9px 11px;text-decoration:none;background:#0b1018;font-size:13px}.contact{background:#12070a;border-top:1px solid #3b1d22}.phone{font-size:28px;font-weight:900;text-decoration:none}footer{border-top:1px solid #242b36;padding:22px 0;color:#9ca7b8;font-size:12px}@media(max-width:760px){.nav{display:none}.content{grid-template-columns:1fr}.head{gap:10px}.hero{padding:46px 0}.lang{margin-left:auto}.hero h1{font-size:42px}}</style></head><body>'+
-    '<header><div class="wrap head"><a class="brand" href="/kk/">SCAN<b>LINE</b></a><nav class="nav">'+kkNavLinks()+'</nav><div class="lang"><a href="'+ruPath+'?lang=ru">РУС</a><a class="active" href="'+kkPath+'">ҚАЗ</a></div></div></header>'+
-    '<main><section class="hero"><div class="wrap"><div class="kicker">SCANLINE · АЛМАТЫ · КРЫЛОВА 36</div><h1>'+escapeHtml(data.h1)+'</h1><p class="lead">'+escapeHtml(data.lead)+'</p><div class="actions"><a class="btn" href="https://wa.me/77073444404?text='+encodeURIComponent("Сәлеметсіз бе! ScanLine сайты арқылы диагностикаға жазылғым келеді.")+'" target="_blank" rel="noopener">WHATSAPP АРҚЫЛЫ ЖАЗЫЛУ</a><a class="btn" href="tel:+77073444404">ҚОҢЫРАУ ШАЛУ</a></div></div></section>'+
-    '<section><div class="wrap content"><div class="box"><h2>'+escapeHtml(data.service)+'</h2><p>'+escapeHtml(data.body)+'</p><p>Диагностика нақты автокөлікке, модельге, шығарылған жылына және байқалған белгілерге қарай жүргізіледі. Қате кодының өзі әрдайым соңғы диагноз болмайды.</p></div><div class="box local"><h2>SCANLINE АЛМАТЫ</h2><p><strong>Мекенжай:</strong> Алматы, Крылова көшесі 36</p><p><strong>Жұмыс уақыты:</strong> күн сайын 10:00–18:00</p><p><strong>Телефон:</strong> <a href="tel:+77073444404">'+phone+'</a></p><p>Клиентке бару қызметі жоқ — автокөлікті сервисте қабылдаймыз.</p></div></div></section>'+
-    details+'<section><div class="wrap"><div class="box"><h2>SCANLINE ҚЫЗМЕТТЕРІ</h2><div class="links">'+links+'</div></div></div></section>'+
-    '<section class="contact"><div class="wrap"><h2>АЛМАТЫДАҒЫ АВТОЭЛЕКТРИК ЖӘНЕ ДИАГНОСТИКА</h2><p>Крылова көшесі 36 · күн сайын 10:00–18:00</p><a class="phone" href="tel:+77073444404">'+phone+'</a></div></section></main>'+
-    '<footer><div class="wrap">© ScanLine Almaty · Автоэлектрика және компьютерлік диагностика</div></footer></body></html>';
+async function kkPageHtml(data,ruPath){
+  const source=await readFile(path.join(__dirname,ruPath,"index.html"),"utf8");
+  return localizeRussianHtml(source,data,ruPath,Object.keys(kkPages));
 }
 function hreflangTagsForRu(pathname){
   const ru=pathname.endsWith("/")?pathname:pathname+"/";
@@ -632,7 +577,7 @@ const server=http.createServer(async(req,res)=>{
       const requestedKkPath=url.pathname==="/kk"?"/kk/":url.pathname;
       const ruPath=kkRuPath(requestedKkPath);
       if(kkPages[ruPath]){
-        const html=normalizeLocalizedSeo(kkPageHtml(kkPages[ruPath],ruPath),hreflangTagsForRu(ruPath),ruPath).replace("</head>",responsiveAuditCss()+"</head>").replace("</body>",visitorCounterSnippet("kk")+"</body>");
+        const html=normalizeLocalizedSeo(await kkPageHtml(kkPages[ruPath],ruPath),hreflangTagsForRu(ruPath),ruPath).replace("</head>",responsiveAuditCss()+"</head>").replace("</body>",visitorCounterSnippet("kk")+"</body>");
         res.writeHead(200,{"Content-Type":"text/html; charset=utf-8","Cache-Control":"no-store, no-cache, must-revalidate","Content-Language":"kk-KZ"});
         if(req.method==="HEAD") return res.end();
         return res.end(html);

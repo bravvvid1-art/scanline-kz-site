@@ -30,7 +30,7 @@ await mkdir(out,{recursive:true});await copy();
 await copyFile('pages-assistant.js',path.join(out,'pages-assistant.js'));
 for(const [ruPath,data] of Object.entries(kkPages)){
   const dest=path.join(out,'kk',ruPath,'index.html');
-  await mkdir(path.dirname(dest),{recursive:true});await writeFile(dest,prepare(normalizeLocalizedSeo(kkPageHtml(data,ruPath),hreflangTagsForRu(ruPath),ruPath)));
+  await mkdir(path.dirname(dest),{recursive:true});await writeFile(dest,prepare(normalizeLocalizedSeo(await kkPageHtml(data,ruPath),hreflangTagsForRu(ruPath),ruPath)));
 }
 await writeFile(path.join(out,'.nojekyll'),'');
 await writeFile(path.join(out,'sitemap.xml'),buildSitemap(Object.keys(kkPages)));
