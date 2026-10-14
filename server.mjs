@@ -529,8 +529,8 @@ const server=http.createServer(async(req,res)=>{
   try{
     const url=new URL(req.url,"http://localhost");
     const host=(req.headers.host||"").split(":")[0].toLowerCase();
-    if(host==="www.scanline.kz"){
-      res.writeHead(301,{Location:"https://scanline.kz"+url.pathname+url.search,"Cache-Control":"no-store"});
+    if(host==="scanline.kz"){
+      res.writeHead(301,{Location:"https://www.scanline.kz"+url.pathname+url.search,"Cache-Control":"no-store"});
       return res.end();
     }
     if(url.pathname==="/favicon.ico"){
