@@ -116,5 +116,9 @@ export function localizeRussianHtml(html,data,ruPath,paths){
   if(!/\/lang\.css/.test(html))html=html.replace('</head>','<link rel="stylesheet" href="/lang.css"></head>');
   if(!/\/lang\.js/.test(html))html=html.replace('</head>','<script defer src="/lang.js?v=20261014-language-header"></script></head>');
   html=html.replace(/\/lang\.js\?v=[^"'<> ]+/g,'/lang.js?v=20261014-language-header');
+  if(ruPath==='/'){
+    html=html.replace(/<h1>[^]*?<\/h1>/,'<h1>АВТОЭЛЕКТРИКА<br>ЖӘНЕ<br>КОМПЬЮТЕРЛІК<br>ДИАГНОСТИКА<br><span>АЛМАТЫДА</span></h1>');
+    html=html.replace('</head>','<style id="kazakh-home-reference">@media(min-width:1001px){html[lang="kk"] .hero-content{width:44%;max-width:660px;padding-right:20px}html[lang="kk"] .hero-content h1{font-size:clamp(42px,3.6vw,68px)}html[lang="kk"] .hero-actions{gap:26px}html[lang="kk"] .facts{font-size:13px;gap:18px}}@media(min-width:641px) and (max-width:1000px){html[lang="kk"] .masters-overlay{position:relative;right:auto;bottom:auto;margin:0 18px 24px;justify-content:center}html[lang="kk"] .hero-content{max-width:100%;width:100%}}@media(max-width:640px){html[lang="kk"] .hero-content h1{font-size:38px}}</style></head>');
+  }
   return html;
 }
