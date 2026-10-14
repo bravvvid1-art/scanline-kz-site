@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://scanline.kz/sitemap.xml
+Sitemap: https://www.scanline.kz/sitemap.xml
