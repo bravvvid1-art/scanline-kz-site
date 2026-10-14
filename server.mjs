@@ -525,6 +525,11 @@ function visitorCounterSnippet(lang="ru"){
     '<script>(function(){var el=document.getElementById("siteVisitorCount");if(!el)return;var k="scanlineVisitorId";var id="";try{id=localStorage.getItem(k)||"";if(!id){id=(crypto&&crypto.randomUUID)?crypto.randomUUID():"v-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2);localStorage.setItem(k,id)}}catch(e){id="v-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2)}fetch("/api/visitor-count",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({visitorId:id}),credentials:"same-origin"}).then(function(r){if(!r.ok)throw new Error("counter");return r.json()}).then(function(d){var n=Number(d&&d.count);el.textContent=Number.isFinite(n)?new Intl.NumberFormat("'+locale+'").format(n):"—"}).catch(function(){el.textContent="—"})})();</script>';
 }
 
+async function notFound(req,res){
+  const html=await readFile(path.join(__dirname,"404.html"));
+  res.writeHead(404,{"Content-Type":"text/html; charset=utf-8","Cache-Control":"no-store"});
+  return res.end(req.method==="HEAD"?undefined:html);
+}
 const server=http.createServer(async(req,res)=>{
   try{
     const url=new URL(req.url,"http://localhost");
