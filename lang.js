@@ -212,13 +212,15 @@ function mount(){
     return;
   }
   const qp=new URLSearchParams(location.search).get("lang");
+  // A saved language must not redirect an explicitly requested Russian URL.
+  // Keep each language at its own stable URL for visitors and search engines.
   const saved=qp==="kk"||qp==="ru"?qp:storageGet("scanlineLang");
-  if(saved==="kk"){
+  if(qp==="kk"){
     const target=kkTarget();
     navigateTo(target);
     return;
   }
-  if(saved==="ru"){apply("ru");return;}
+  if(saved || location.pathname!=="/"){apply("ru");return;}
   const modal=document.createElement('div');modal.className='lang-choice';modal.innerHTML='<div class="lang-choice-card"><div class="lang-choice-mark">S</div><h3>Тілді таңдаңыз / Выберите язык</h3><p>На каком языке открыть сайт ScanLine? / ScanLine сайтын қай тілде ашу керек?</p><div class="lang-choice-actions"><button type="button" data-pick="kk">ҚАЗАҚША</button><button type="button" data-pick="ru">РУССКИЙ</button></div></div>';
   document.body.appendChild(modal);modal.querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>{
     const lang=b.dataset.pick;
