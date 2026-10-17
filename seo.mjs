@@ -19,7 +19,8 @@ export function buildSitemap(paths) {
 export function normalizeLocalizedSeo(html, alternateTags, ruPath) {
   // A single canonical host prevents mixed www/non-www signals in generated pages.
   html = html.replaceAll('https://scanline.kz/', origin + '/');
-  const canonicalUrl = origin + ruPath;
+  const isKazakh = /<html\b[^>]*\blang=["']kk["']/i.test(html);
+  const canonicalUrl = origin + (isKazakh ? '/kk' + ruPath : ruPath);
   html = html.replace(/<link\b(?=[^>]*\brel=["']canonical["'])[^>]*>/gi, '');
   html = html.replace('</head>', '<link rel="canonical" href="' + canonicalUrl + '"></head>');
   if (alternateTags) {
