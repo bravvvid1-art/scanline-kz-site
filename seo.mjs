@@ -17,7 +17,11 @@ export function buildSitemap(paths) {
 }
 
 export function normalizeLocalizedSeo(html, alternateTags, ruPath) {
+  // A single canonical host prevents mixed www/non-www signals in generated pages.
   html = html.replaceAll('https://scanline.kz/', origin + '/');
+  const canonicalUrl = origin + ruPath;
+  html = html.replace(/<link\b(?=[^>]*\brel=["']canonical["'])[^>]*>/gi, '');
+  html = html.replace('</head>', '<link rel="canonical" href="' + canonicalUrl + '"></head>');
   if (alternateTags) {
     html = html.replace(/<link\b[^>]*\bhreflang\s*=\s*["'][^"']*["'][^>]*>/gi, '');
     html = html.replace('</head>', alternateTags.replaceAll('https://scanline.kz/', origin + '/') + '</head>');
