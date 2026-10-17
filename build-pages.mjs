@@ -15,7 +15,7 @@ async function copy(dir=''){
     if(path.extname(rel)==='.html'){
       let html=await readFile(path.join(root,rel),'utf8');
       const ruPath=rel==='index.html'?'/':'/'+rel.replaceAll(path.sep,'/').replace(/index\.html$/,'');
-      if(kkPages[ruPath])html=normalizeLocalizedSeo(html,hreflangTagsForRu(ruPath),ruPath);
+      html=normalizeLocalizedSeo(html,kkPages[ruPath]?hreflangTagsForRu(ruPath):'',ruPath);
       html=prepare(html);await writeFile(dest,html);
     }else await copyFile(path.join(root,rel),dest);
   }
