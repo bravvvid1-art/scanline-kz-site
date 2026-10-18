@@ -495,7 +495,7 @@ function kkPageHtml(data,ruPath){
       {"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Басты бет","item":"https://scanline.kz/kk/"},{"@type":"ListItem","position":2,"name":data.h1,"item":"https://scanline.kz"+kkPath}]}
     ]
   });
-  return '<!doctype html><html lang="kk"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">'+
+  let html = '<!doctype html><html lang="kk"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">'+
     '<title>'+escapeHtml(data.title)+'</title><meta name="description" content="'+escapeHtml(data.description)+'">'+
     '<meta name="robots" content="index,follow,max-image-preview:large">'+
     '<link rel="canonical" href="https://scanline.kz'+kkPath+'">'+
@@ -513,6 +513,11 @@ function kkPageHtml(data,ruPath){
     '<section><div class="wrap"><div class="box"><h2>SCANLINE ҚЫЗМЕТТЕРІ</h2><div class="links">'+links+'</div></div></div></section>'+
     '<section class="contact"><div class="wrap"><h2>АЛМАТЫДАҒЫ АВТОЭЛЕКТРИК ЖӘНЕ ДИАГНОСТИКА</h2><p>Крылова көшесі 36 · күн сайын 10:00–18:00</p><a class="phone" href="tel:+77073444404">'+phone+'</a></div></section></main>'+
     '<footer><div class="wrap">© ScanLine Almaty · Автоэлектрика және компьютерлік диагностика</div></footer></body></html>';
+  if (ruPath === '/ustanovka-avtosignalizacii/') {
+    html = html.replace('</style>', "/* Keep the service video outside the homepage-only master-card grid. */\n.hero.hero-with-video{display:block!important;grid-template-columns:none!important;padding:clamp(32px,4vw,60px) 4.5% 48px!important;min-height:0!important}\n.hero.hero-with-video .hero-layout{display:grid;width:100%;max-width:1600px;margin-inline:auto;grid-template-columns:minmax(320px,480px) minmax(0,1fr);gap:clamp(28px,3vw,52px);align-items:center}\n.hero-copy,.hero-video{min-width:0}.hero-video{margin:0;width:100%;max-width:none}\n.hero-video h2{font-size:20px;line-height:1.3;margin:0 0 14px;font-weight:900}\n.hero.hero-with-video .video-frame{width:100%!important;max-width:none!important;aspect-ratio:16/9;border:1px solid #344158;background:#10141b}\n.video-frame iframe{display:block;width:100%;height:100%;border:0}\n@media(max-width:900px){.hero.hero-with-video .hero-layout{grid-template-columns:minmax(0,1fr);gap:28px}.hero-video h2{font-size:clamp(18px,4vw,22px)}}\n" + '</style>');
+    html = html.replace(/<section class="hero"><div class="wrap">([\s\S]*?)<\/div><\/section>/, (_, copy) => '<section class="hero hero-with-video"><div class="wrap hero-layout"><div class="hero-copy">' + copy + '</div>' + "<aside class=\"hero-video\"><h2>АВТОДАБЫЛ ОРНАТУ — ВИДЕО</h2><div class=\"video-frame\"><iframe src=\"https://www.youtube-nocookie.com/embed/bW45JoCO7V4\" title=\"Автодабыл орнату — видео\" loading=\"lazy\" referrerpolicy=\"strict-origin-when-cross-origin\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" allowfullscreen></iframe></div></aside>" + '</div></section>');
+  }
+  return html;
 }
 function hreflangTagsForRu(pathname){
   const ru=pathname.endsWith("/")?pathname:pathname+"/";
@@ -702,3 +707,4 @@ export {kkPages,kkPageHtml,responsiveAuditCss,hreflangTagsForRu};
 if(process.argv[1] && path.resolve(process.argv[1])===fileURLToPath(import.meta.url)){
   server.listen(PORT,"0.0.0.0",()=>console.log("ScanLine server listening on",PORT));
 }
+
