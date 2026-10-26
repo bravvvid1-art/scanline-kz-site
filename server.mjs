@@ -1,3 +1,4 @@
+import {trainingPage,addSecondContact} from './training-page.mjs';
 import http from "node:http";
 import { gzipSync } from "node:zlib";
 import { readFile, stat } from "node:fs/promises";
@@ -120,6 +121,7 @@ function mime(p){
 
 
 const kkPages={
+ '/obuchenie/':{title:'Автокөлік блоктарымен практикалық оқыту | ScanLine',description:'Алматыда EEPROM, Flash, аспаптар панелі және SRS бойынша практикалық сабақтар.',h1:'Автокөлік блоктарымен практикалық оқыту'},
   "/":{
     title:"Алматыдағы автоэлектрик — компьютерлік диагностика және жөндеу | ScanLine",
     description:"Алматыдағы ScanLine автоэлектригі: автокөлікті компьютерлік диагностикалау, электр жүйесін және сымдарын жөндеу, қытай автокөліктерін диагностикалау. Крылова 36, 10:00–18:00.",
@@ -457,10 +459,11 @@ function kkNavLinks(){
     ["/kk/avtoelektrik-almaty/","АВТОЭЛЕКТРИК"],
     ["/kk/kompyuternaya-diagnostika/","ДИАГНОСТИКА"],
     ["/kk/diagnostika-kitajskih-avto/","ҚЫТАЙ КӨЛІКТЕРІ"],
-    ["/kk/ceny/","БАҒАЛАР"]
+    ["/kk/ceny/","БАҒАЛАР"],["/kk/obuchenie/","ОҚЫТУ"]
   ].map(([href,label])=>'<a href="'+href+'">'+label+'</a>').join("");
 }
 function kkPageHtml(data,ruPath){
+  if(ruPath==='/obuchenie/') return addSecondContact(trainingPage(true));
   const kkPath=kkAltPath(ruPath);
   const phone="+7 707 344 44 04";
   const links=[
@@ -520,7 +523,7 @@ function kkPageHtml(data,ruPath){
   if (ruPath === '/diagnostika-kitajskih-avto/') {
     html = html.replaceAll('bW45JoCO7V4', '_kNCaj2yHII').replaceAll('АВТОДАБЫЛ ОРНАТУ — ВИДЕО', 'ҚЫТАЙ КӨЛІКТЕРІН ДИАГНОСТИКАЛАУ — ВИДЕО').replaceAll('Автодабыл орнату — видео', 'Қытай көліктерін диагностикалау — видео');
   }
-  return html;
+  return addSecondContact(html);
 }
 function hreflangTagsForRu(pathname){
   const ru=pathname.endsWith("/")?pathname:pathname+"/";
@@ -692,6 +695,7 @@ const server=http.createServer(async(req,res)=>{
         }
         html=html.replace('<div class="phone">☎ +7 707 344 44 04</div>','<a class="phone" href="tel:+77073444404">☎ +7 707 344 44 04</a>');
         html=html.replace(/<img([^>]*class="hero-bg"[^>]*)>/g,'<img$1 fetchpriority="high" decoding="async">');
+        html=addSecondContact(html);
         buf=Buffer.from(html.replaceAll("https://scanline.kz/","https://www.scanline.kz/"),"utf8");
       }
       const headers={"Content-Type":contentType,"Cache-Control":['.webp','.png','.jpg','.svg','.woff','.woff2'].includes(path.extname(file).toLowerCase())?'public, max-age=86400, stale-while-revalidate=604800':'no-cache',"Content-Language":"ru-KZ",Vary:'Accept-Encoding'};
@@ -710,5 +714,6 @@ export {kkPages,kkPageHtml,responsiveAuditCss,hreflangTagsForRu};
 if(process.argv[1] && path.resolve(process.argv[1])===fileURLToPath(import.meta.url)){
   server.listen(PORT,"0.0.0.0",()=>console.log("ScanLine server listening on",PORT));
 }
+
 
 

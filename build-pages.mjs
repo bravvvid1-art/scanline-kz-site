@@ -1,3 +1,4 @@
+import {addSecondContact} from './training-page.mjs';
 import {readFile,writeFile,mkdir,readdir,copyFile} from 'node:fs/promises';
 import path from 'node:path';
 import {kkPages,kkPageHtml,responsiveAuditCss,hreflangTagsForRu} from './server.mjs';
@@ -24,7 +25,7 @@ function prepare(html){
   html=html.replaceAll('AI-КОНСУЛЬТАНТ','ПОМОЩНИК').replaceAll('SCANLINE AI','SCANLINE').replaceAll('Я AI-консультант ScanLine','Я справочный помощник ScanLine').replaceAll('AI-консультанта','помощника').replaceAll('AI-консультант ScanLine','Помощник ScanLine').replaceAll('AI думает…','Подготавливаю ответ…');
   html=html.replace(/fetch\('\/api\/chat',\{method:'POST',headers:\{'Content-Type':'application\/json'\},body:JSON\.stringify\(\{message:q,history:history\.slice\(-6\),lang:document\.documentElement\.lang\}\)\}\)/g,"Promise.resolve({ok:true,json:async()=>window.scanlineAnswer(q,document.documentElement.lang)})");
   if(!html.includes('scanline-responsive-audit'))html=html.replace('</head>',responsiveAuditCss()+'</head>');
-  return html.replaceAll('https://scanline.kz/','https://www.scanline.kz/').replace('</head>','<script src="/pages-assistant.js"></script></head>');
+  return addSecondContact(html).replaceAll('https://scanline.kz/','https://www.scanline.kz/').replace('</head>','<script src="/pages-assistant.js"></script></head>');
 }
 await mkdir(out,{recursive:true});await copy();
 await copyFile('pages-assistant.js',path.join(out,'pages-assistant.js'));
@@ -36,3 +37,4 @@ await writeFile(path.join(out,'.nojekyll'),'');
 await writeFile(path.join(out,'sitemap.xml'),buildSitemap(Object.keys(kkPages)));
 await writeFile(path.join(out,'sitemap.txt'),sitemapUrls(Object.keys(kkPages)).join('\n')+'\n');
 console.log('Static Pages export ready; Kazakh pages:',Object.keys(kkPages).length);
+
