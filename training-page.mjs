@@ -13,9 +13,15 @@ return `<!doctype html><html lang="${kk?'kk':'ru'}"><head><meta charset="utf-8">
 }
 
 export function addSecondContact(html){
+html=html.replace(/(<a\b[^>]*class=["'][^"']*\bbrand\b[^"']*["'][^>]*>)([\s\S]*?)(<\/a>)/gi,(all,open,body,close)=>{
+  if(body.includes('logo-scanline.webp'))return all;
+  return open+'<img src="/assets/logo-scanline.webp" alt="ScanLine Almaty" width="430" height="140" decoding="async" style="display:block!important;width:220px!important;max-width:55vw!important;height:auto!important;object-fit:contain!important">'+close;
+});
+
  if(html.includes('id="scanline-extra-contact"'))return html;
  const kk=/<html[^>]*lang=["']kk/.test(html);
  const label=kk?'БАЙЛАНЫС':'СВЯЗАТЬСЯ';
  return html.replace('</body>',`<aside id="scanline-extra-contact" aria-label="${label}" style="border-top:1px solid #344054;background:#080b10;color:#eee;padding:22px 4%;font:14px/1.6 Arial,sans-serif"><div style="max-width:1440px;margin:auto;display:flex;flex-wrap:wrap;align-items:center;gap:14px 26px"><strong>SCANLINE · ${label}</strong><span><a style="color:inherit" href="tel:+77073444404">+7 707 344 44 04</a> · <a style="color:#ff6b73" href="https://wa.me/77073444404">WhatsApp</a></span><span><a style="color:inherit" href="tel:+77753444409">+7 775 344 44 09</a> · <a style="color:#ff6b73" href="https://wa.me/77753444409">WhatsApp</a></span><a style="color:inherit" href="${kk?'/kk':''}/obuchenie/">${kk?'Практикалық оқыту':'Практическое обучение'} ↗</a></div></aside></body>`);
 }
+
 
