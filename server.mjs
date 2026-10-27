@@ -684,9 +684,7 @@ const server=http.createServer(async(req,res)=>{
         if(!/\/lang\.js/i.test(html)){
           html=html.replace("</head>",'<script defer src="/lang.js?v=20260923-mobile-audit2"></script></head>');
         }
-        if(kkPages[ruKey]){
-          html=normalizeLocalizedSeo(html,hreflangTagsForRu(ruKey),ruKey);
-        }
+        html=normalizeLocalizedSeo(html,kkPages[ruKey]?hreflangTagsForRu(ruKey):'',ruKey);
         if(!html.includes("scanline-responsive-audit")){
           html=html.replace("</head>",responsiveAuditCss()+"</head>");
         }
@@ -714,6 +712,7 @@ export {kkPages,kkPageHtml,responsiveAuditCss,hreflangTagsForRu};
 if(process.argv[1] && path.resolve(process.argv[1])===fileURLToPath(import.meta.url)){
   server.listen(PORT,"0.0.0.0",()=>console.log("ScanLine server listening on",PORT));
 }
+
 
 
 
