@@ -1,3 +1,4 @@
+import {optimizeLocalContent} from './local-services.mjs';
 const origin = 'https://www.scanline.kz';
 
 // The works page is a placeholder until genuine repair cases are published.
@@ -17,6 +18,7 @@ export function buildSitemap(paths) {
 }
 
 export function normalizeLocalizedSeo(html, alternateTags, ruPath) {
+  html=optimizeLocalContent(html,ruPath);
   // A single canonical host prevents mixed www/non-www signals in generated pages.
   html = html.replaceAll('https://scanline.kz/', origin + '/');
   const isKazakh = /<html\b[^>]*\blang=["']kk["']/i.test(html);
@@ -59,4 +61,5 @@ export function normalizeLocalizedSeo(html, alternateTags, ruPath) {
   }
   return html;
 }
+
 
