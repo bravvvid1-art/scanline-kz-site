@@ -1,3 +1,4 @@
+import {localServices,newServicePage} from './local-services.mjs';
 import {trainingPage,addSecondContact} from './training-page.mjs';
 import http from "node:http";
 import { gzipSync } from "node:zlib";
@@ -121,6 +122,7 @@ function mime(p){
 
 
 const kkPages={
+ ...Object.fromEntries(['/rusifikaciya-kitajskih-avto/','/zamena-kolonok/'].map(path=>[path,{title:localServices[path].kk[0],description:localServices[path].kk[1],h1:localServices[path].kk[2]}])),
  '/obuchenie/':{title:'Автокөлік блоктарымен практикалық оқыту | ScanLine',description:'Алматыда EEPROM, Flash, аспаптар панелі және SRS бойынша практикалық сабақтар.',h1:'Автокөлік блоктарымен практикалық оқыту'},
   "/":{
     title:"Алматыдағы автоэлектрик — компьютерлік диагностика және жөндеу | ScanLine",
@@ -463,6 +465,7 @@ function kkNavLinks(){
   ].map(([href,label])=>'<a href="'+href+'">'+label+'</a>').join("");
 }
 function kkPageHtml(data,ruPath){
+  if(['/rusifikaciya-kitajskih-avto/','/zamena-kolonok/'].includes(ruPath)) return addSecondContact(newServicePage(ruPath,true));
   if(ruPath==='/obuchenie/') return addSecondContact(trainingPage(true));
   const kkPath=kkAltPath(ruPath);
   const phone="+7 707 344 44 04";
@@ -712,6 +715,7 @@ export {kkPages,kkPageHtml,responsiveAuditCss,hreflangTagsForRu};
 if(process.argv[1] && path.resolve(process.argv[1])===fileURLToPath(import.meta.url)){
   server.listen(PORT,"0.0.0.0",()=>console.log("ScanLine server listening on",PORT));
 }
+
 
 
 
