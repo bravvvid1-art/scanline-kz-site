@@ -7,7 +7,7 @@ const root=process.cwd(), out=path.join(root,'_site');
 const allowed=new Set(['.html','.css','.js','.svg','.png','.jpg','.jpeg','.webp','.gif','.ico','.woff','.woff2','.ttf','.txt','.xml','.pdf','.mp4']);
 async function copy(dir=''){
   for(const entry of await readdir(path.join(root,dir),{withFileTypes:true})){
-    if(entry.name.startsWith('.')||['node_modules','_site','tests'].includes(entry.name))continue;
+    if(entry.name.startsWith('.')||['node_modules','_site','tests','preview'].includes(entry.name))continue;
     const rel=path.join(dir,entry.name), dest=path.join(out,rel);
     if(entry.isDirectory()){await copy(rel);continue;}
     if(entry.name!=='CNAME'&&!allowed.has(path.extname(entry.name)))continue;
@@ -37,4 +37,3 @@ await writeFile(path.join(out,'.nojekyll'),'');
 await writeFile(path.join(out,'sitemap.xml'),buildSitemap(Object.keys(kkPages)));
 await writeFile(path.join(out,'sitemap.txt'),sitemapUrls(Object.keys(kkPages)).join('\n')+'\n');
 console.log('Static Pages export ready; Kazakh pages:',Object.keys(kkPages).length);
-
